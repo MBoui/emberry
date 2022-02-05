@@ -1,6 +1,9 @@
-
 <script lang="ts">
+import { Router, Route } from "svelte-navigator";
 import Titlebar from "./win/Titlebar.svelte";
+import Login from "./nav/Login.svelte";
+import Home from "./nav/Home.svelte";
+
 import { appWindow } from '@tauri-apps/api/window'
 
 let isFocused = true;
@@ -10,22 +13,25 @@ appWindow.listen("tauri://blur", () => isFocused = false);
 
 </script>
 
-<main focus={isFocused}>
+<main class="{isFocused ? 'focused' : 'unfocused'}">
 
 	<Titlebar />
 
 	<div class="background">
-		<div class="card">
+		<Router>
+			<Route path="/"><Login /></Route>
+			<Route path="home"><Home /></Route>
+		</Router>
+
+		<!-- <div class="card">
 			<h1>CodeX</h1>
 			<p>To open a folder press Ctrl + O</p>
-		</div>
+		</div> -->
 	</div>
 
 </main>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
-
 main {
 	text-align: center;
 	padding: 1em;
@@ -44,21 +50,21 @@ main {
 		align-items: center;
 		flex-direction: column;
 
-		.card {
-			width: 300px;
-			height: 200px;
+		// .card {
+		// 	width: 300px;
+		// 	height: 200px;
 
-			h1 {
-				color: #222;
-				font-family: 'Inter', sans-serif;
-				font-size: 4em;
-				margin: 0;
-			}
+		// 	h1 {
+		// 		color: #222;
+		// 		font-family: 'Inter', sans-serif;
+		// 		font-size: 4em;
+		// 		margin: 0;
+		// 	}
 
-			p {
-				color: #777;
-			}
-		}
+		// 	p {
+		// 		color: #777;
+		// 	}
+		// }
 	}
 }
 

@@ -1,11 +1,11 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "flux"
+version = "0.0.0"
+description = "A cool chat app"
+authors = ["Max Coppen"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "flux"
 edition = "2018"
 build = "src/build.rs"
 
@@ -17,7 +17,8 @@ tauri-build = { version = "1.0.0-beta.4" }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.0-beta.8", features = ["api-all"] }
+tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", features = ["api-all"] }
+tauri-plugin-shadows = { git = "https://github.com/tauri-apps/tauri-plugin-shadows", features = ["tauri-impl"] } # or "tao-impl" for TAO projects.
 
 [features]
 default = [ "custom-protocol" ]

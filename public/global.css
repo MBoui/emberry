@@ -16,11 +16,11 @@ body {
 
 /** Change the window outline on focus */
 
-main[focus=true] {
+main.focused {
 	border: 1px solid #0d0d0d;
 }
 
-main[focus=false] {
+main.unfocused {
 	border: 1px solid #393939;
 }
 
