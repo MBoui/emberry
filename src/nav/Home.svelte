@@ -1,9 +1,15 @@
 <script lang="ts">
+import { latest_msg } from '@/stores';
 
+let msg: String;
+
+latest_msg.subscribe(value => {
+    msg = value;
+});
 </script>
 
 <div class="card">
-    <h1>Home</h1>
+    <h1>{msg}</h1>
 </div>
 
 <style lang="scss">
@@ -18,10 +24,9 @@
         align-items: center;
 
         h1 {
-            color: #222;
-            font-family: "Inter", sans-serif;
-            font-size: 4em;
-            font-weight: 900;
+            color: #dddddd;
+            font-size: 1em;
+            font-weight: 500;
             margin: 0;
             outline: none;
         }
