@@ -1,16 +1,14 @@
 <script lang="ts">
-import { client } from '@/stores';
+import { invoke } from '@tauri-apps/api/tauri'
 import { useNavigate } from "svelte-navigator";
-import { Client } from "../core/client";
 
 const navigate = useNavigate();
+let name = '';
 
 const join = () => {
-    new Client((instance: Client) => {
-        client.set(instance);
-        navigate('/home');
-        console.log('test');
-    });
+    console.log('username: ' + name);
+    invoke('web_connect', { username: name });
+    navigate('/home');
 };
 </script>
 
@@ -18,7 +16,7 @@ const join = () => {
     <h1>Flux</h1>
     <p>Join the network!</p>
     <div class="login">
-        <input type="text" placeholder="Enter your username...">
+        <input type="text" placeholder="Enter your username..." bind:value={name}>
         <button on:click="{() => join()}">
             Join
         </button>

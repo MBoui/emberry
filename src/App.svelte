@@ -1,15 +1,20 @@
 <script lang="ts">
+import { listen } from '@tauri-apps/api/event'
+import { appWindow } from '@tauri-apps/api/window'
+
 import { Router, Route } from "svelte-navigator";
 import Titlebar from "./win/Titlebar.svelte";
 import Login from "./nav/Login.svelte";
 import Home from "./nav/Home.svelte";
 
-import { appWindow } from '@tauri-apps/api/window'
-
 let isFocused = true;
 
 appWindow.listen("tauri://focus", () => isFocused = true);
 appWindow.listen("tauri://blur", () => isFocused = false);
+
+listen('onmessage', ev => {
+    console.log((ev.payload as any).message);
+});
 
 </script>
 
@@ -22,11 +27,6 @@ appWindow.listen("tauri://blur", () => isFocused = false);
 			<Route path="/"><Login /></Route>
 			<Route path="home"><Home /></Route>
 		</Router>
-
-		<!-- <div class="card">
-			<h1>CodeX</h1>
-			<p>To open a folder press Ctrl + O</p>
-		</div> -->
 	</div>
 
 </main>
@@ -49,22 +49,6 @@ main {
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
-
-		// .card {
-		// 	width: 300px;
-		// 	height: 200px;
-
-		// 	h1 {
-		// 		color: #222;
-		// 		font-family: 'Inter', sans-serif;
-		// 		font-size: 4em;
-		// 		margin: 0;
-		// 	}
-
-		// 	p {
-		// 		color: #777;
-		// 	}
-		// }
 	}
 }
 
