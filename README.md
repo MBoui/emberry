@@ -1,4 +1,4 @@
-# Flux Chat - A Place to Share
+# Flux - Places to Share
 
 ## Flux
 ...
