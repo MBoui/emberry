@@ -28,18 +28,18 @@ const close = () => appWindow.close();
     <div class="decorations">
 
         <div class="button" on:click={minimize}>
-            <svg width="15" height="15" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
+            <svg width="14" height="14" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
                 <rect x=".7938" y="2.5135" width="3.7042" height=".26458" fill="currentColor" style="paint-order:markers fill stroke"/>
             </svg>
         </div>
 
         <div class="button" on:click={maximize}>
             {#if !isMaximized}
-                <svg width="15" height="15" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
+                <svg width="14" height="14" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
                     <path d="m0.79374 0.79374v3.7041h3.7041v-3.7041zm0.26458 0.26458h3.175v3.175h-3.175z" fill="currentColor" stroke-width=".26458" style="paint-order:markers fill stroke"/>
                 </svg>
             {:else}
-                <svg width="15" height="15" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
+                <svg width="14" height="14" version="1.1" viewBox="0 0 5.2917 5.2917" xmlns="http://www.w3.org/2000/svg">
                     <path transform="scale(.26458)" d="m3 6v11h11v-11h-11zm1 1h9v9h-9v-9z" fill="currentColor" stroke-dashoffset="44.5" stroke-linecap="round" stroke-width="1.4385" style="paint-order:markers fill stroke"/>
                     <path transform="scale(.26458)" d="m6 3v4h1v-3h9v9h-3v1h4v-11h-11z" fill="currentColor" stroke-dashoffset="44.5" stroke-linecap="round" stroke-width="1.4385" style="paint-order:markers fill stroke"/>
                 </svg>

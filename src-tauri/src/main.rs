@@ -40,6 +40,12 @@ async fn web_connect(window: Window, username: String) {
   println!("username: {}", username);
   write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username))).await.unwrap();
 
+  // Subscribe to the send message event from the frontend.
+  //window.listen_global("send-message", move |event| {
+    //write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username)));
+    //println!("got event-name with payload {:?}", event.payload());
+  //});
+
   // Wait for messages to arrive.
   read.for_each(|message| async {
     let data = String::from_utf8(message.unwrap().into_data()).unwrap();
