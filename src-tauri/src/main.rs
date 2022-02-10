@@ -14,6 +14,7 @@ struct Payload {
 }
 
 fn main() {
+  // Tauri build setup:
   tauri::Builder::default()
     .setup(|app| {
       let window = app.get_window("main").unwrap();
@@ -35,13 +36,13 @@ async fn web_connect(window: Window, username: String) {
 
   let (mut write, read) = ws_stream.split();
 
+  // Send a login request to the server.
   println!("username: {}", username);
   write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username))).await.unwrap();
 
+  // Wait for messages to arrive.
   read.for_each(|message| async {
     let data = String::from_utf8(message.unwrap().into_data()).unwrap();
     window.emit_all("onmessage", Payload { message: data }).unwrap();
   }).await;
-
-  //window.emit_all("onmessage", Payload { message: "Test message!".into() }).unwrap();
 }
