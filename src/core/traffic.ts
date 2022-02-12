@@ -32,10 +32,10 @@ export default function handleTraffic(message: string) {
 
         case 'chat': // when a message is send in global chat.
             store.globalChat.update(chat => {
-                chat.push({ sender: json.sender, content: json.content });
+                chat.push({ sender: json.sender.name, content: json.content });
                 return chat;
             });
-            console.log({ sender: json.sender, content: json.content });
+            console.log({ sender: json.sender.name, content: json.content });
             break;
 
         case 'error':
