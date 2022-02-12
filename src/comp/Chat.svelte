@@ -1,15 +1,29 @@
 <script lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
+import * as store from "@/stores";
+import Feed from "./Feed.svelte";
 
 let input = "";
+let user = "";
+
+store.user.subscribe(value => {
+  user = value.name;
+})
 
 const sendMessage = () => {
   invoke('send_message', { data: input });
+  store.globalChat.update(global => {
+    global.push({ sender: user, content: input });
+    return global;
+  })
 };
 </script>
 
 <div class="chat">
-  <div class="chat-body" />
+  <div class="chat-body">
+    <Feed />
+  </div>
+
   <div class="chat-footer">
     <div class="input">
       <div class="upload">
@@ -54,7 +68,12 @@ const sendMessage = () => {
     align-items: center;
 
     .chat-body {
+      width: calc(100% - 40px);
       flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-end;
     }
 
     .chat-footer {
@@ -98,7 +117,7 @@ const sendMessage = () => {
           background: transparent !important;
           padding: 10px;
           font-size: 0.9em;
-          font-family: Montserrat;
+          font-family: NotoSans;
           color: #dddddd;
         }
 

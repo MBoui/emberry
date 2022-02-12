@@ -1,12 +1,12 @@
 <script lang="ts">
 import { appWindow } from '@tauri-apps/api/window'
-import * as store from "@/stores";
 
 import { Router, Route } from "svelte-navigator";
 import Titlebar from "./win/Titlebar.svelte";
 import Login from "./nav/Login.svelte";
 import Home from "./nav/Home.svelte";
 import { onMount } from 'svelte';
+import initStorage from './core/storage';
 
 let isFocused = true;
 
@@ -16,12 +16,7 @@ appWindow.listen("tauri://blur", () => isFocused = false);
 
 // Setup the user so it persists.
 onMount(() => {
-	if (localStorage.getItem("username") != null && localStorage.getItem("username") != 'null') {
-		store.user.set({ id: '...', name: localStorage.getItem("username") });
-	} else {
-		store.user.set(null);
-	}
-	store.user.subscribe(user => localStorage.setItem("username", (user ? user.name : null)));
+	initStorage();
 });
 
 </script>

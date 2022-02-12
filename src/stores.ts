@@ -11,6 +11,6 @@ export const user = writable<{ id: string, name: string }>(null);
 export const users = writable<Array<{ id: string, name: string }>>([]);
 
 /**
- * The currently active/open chat id.
+ * A log of the global chat.
  */
-export const activeChat = writable<string>("");
+export const globalChat = writable<Array<{ sender: string, content: string }>>([]);

@@ -5,6 +5,7 @@ import * as store from '@/stores';
  * @param message A message recieved from the WebRTC server.
  */
 export default function handleTraffic(message: string) {
+    console.log(message);
     const json = JSON.parse(message);
     console.log('websocket recieved:', json);
 
@@ -27,6 +28,14 @@ export default function handleTraffic(message: string) {
                 users.push(json.user);
                 return users;
             });
+            break;
+
+        case 'chat': // when a message is send in global chat.
+            store.globalChat.update(chat => {
+                chat.push({ sender: json.sender, content: json.content });
+                return chat;
+            });
+            console.log({ sender: json.sender, content: json.content });
             break;
 
         case 'error':
