@@ -40,7 +40,8 @@ fn main() {
 async fn web_connect(window: Window, username: String) {
   println!("Connecting to signal server...");
 
-  let addr = env::var("SERVER_ADDRESS").expect("Can load server address from .env");
+  //let addr = env::var("SERVER_ADDRESS").expect("Can load server address from .env");
+  let addr = "ws://84.30.14.3:25656";
   let (ws_stream, _) = connect_async(addr).await.expect("Failed to connect");
   println!("WebSocket handshake has been successfully completed");
 

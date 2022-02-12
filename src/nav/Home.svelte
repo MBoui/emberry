@@ -8,7 +8,7 @@ const navigate = useNavigate();
 
 // Handle refreshes:
 onMount(() => {
-	if (sessionStorage.getItem("username") == undefined) navigate('/');
+	if (sessionStorage.getItem("username") == 'null') navigate('/');
 });
 
 </script>

@@ -27,8 +27,9 @@ main.unfocused {
 }
 
 main {
-	width: calc(100% - 3px);
-	height: calc(100% - 3px);
+	width: calc(100vw - 3px);
+	height: calc(100vh - 3px);
+	max-width: none !important;
 	position: absolute;
 	top: 0;
 	left: 0;

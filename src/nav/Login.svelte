@@ -13,11 +13,11 @@ listen('onlogin', () => {
 });
 
 onMount(() => {
-    if (sessionStorage.getItem("username") != undefined) navigate('/home');
+    if (sessionStorage.getItem("username") != 'null') navigate('/home');
 });
 
 const join = () => {
-    if (sessionStorage.getItem("username") == undefined) {
+    if (sessionStorage.getItem("username") == 'null') {
         invoke('web_connect', { username: name });
     } else {
         navigate('/home');

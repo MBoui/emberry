@@ -12,12 +12,14 @@ store.user.subscribe(value => {
 })
 
 const sendMessage = () => {
-  invoke('send_message', { data: input });
-  store.globalChat.update(global => {
-    global.push({ sender: user, content: input });
-    return global;
-  });
-  input = "";
+  if (input.length > 0) {
+    invoke('send_message', { data: input });
+    store.globalChat.update(global => {
+      global.push({ sender: user, content: input });
+      return global;
+    });
+    input = "";
+  }
 };
 </script>
 
