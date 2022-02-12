@@ -11,10 +11,8 @@ export default function handleTraffic(message: string) {
 
     switch (json.type as string) {
         case 'login': // when a login is accepted we check if it was succesful.
-            if (json.success) {
-                const users = json.users as Array<{ id: string, name: string }>;
-                store.users.set(users);
-            }
+            const users = json.users as Array<{ id: string, name: string }>;
+            store.users.set(users);
             break;
 
         case 'leave': // when a user leaves remove them from the users list.
