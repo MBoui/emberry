@@ -3,6 +3,8 @@
   windows_subsystem = "windows"
 )]
 
+use std::env;
+use dotenv::dotenv;
 use std::sync::Arc;
 
 use tauri::{Manager, Window};
@@ -19,6 +21,8 @@ struct Payload {
 static mut SOCKET: Vec<Arc<Mutex<SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>>>> = Vec::new();
 
 fn main() {
+  dotenv().ok();
+
   // Tauri build setup:
   tauri::Builder::default()
     .setup(|app| {
@@ -36,7 +40,8 @@ fn main() {
 async fn web_connect(window: Window, username: String) {
   println!("Connecting to signal server...");
 
-  let (ws_stream, _) = connect_async("ws://84.30.14.3:25656").await.expect("Failed to connect");
+  let addr = env::var("SERVER_ADDRESS").expect("Can load server address from .env");
+  let (ws_stream, _) = connect_async(addr).await.expect("Failed to connect");
   println!("WebSocket handshake has been successfully completed");
 
   let (mut write, read) = ws_stream.split();

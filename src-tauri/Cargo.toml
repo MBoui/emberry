@@ -22,6 +22,7 @@ tauri-plugin-shadows = { git = "https://github.com/tauri-apps/tauri-plugin-shado
 tokio = { version = "1.16.1", features = ["full"] }
 tokio-tungstenite = { version = "*", features = ["native-tls"] }
 futures-util = "0.3"
+dotenv = "0.15.0"
 
 [features]
 default = [ "custom-protocol" ]
