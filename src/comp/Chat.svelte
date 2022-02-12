@@ -1,11 +1,10 @@
 <script lang="ts">
-import * as store from "@/stores";
-import { appWindow } from '@tauri-apps/api/window'
+import { invoke } from "@tauri-apps/api/tauri";
 
 let input = "";
 
 const sendMessage = () => {
-  appWindow.emit('send-message', input);
+  invoke('send_message', { data: input });
 };
 </script>
 

@@ -1,6 +1,21 @@
 <script lang="ts">
 import Users from '../comp/Users.svelte';
 import Chat from '../comp/Chat.svelte';
+import * as store from "@/stores";
+import { onMount } from 'svelte';
+import { useNavigate } from 'svelte-navigator';
+
+const navigate = useNavigate();
+
+let currentUser: { id: string, name: string };
+// Handle refreshes:
+onMount(() => {
+    store.user.subscribe((user) => {
+        currentUser = user;
+    });
+	if (!currentUser) navigate('/');
+});
+
 </script>
 
 <div class="home">

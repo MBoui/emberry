@@ -3,15 +3,20 @@
   windows_subsystem = "windows"
 )]
 
+use std::sync::Arc;
+
 use tauri::{Manager, Window};
 use tauri_plugin_shadows::Shadows;
-use tokio_tungstenite::{connect_async, tungstenite::Message};
-use futures_util::{StreamExt, SinkExt};
+use tokio::net::TcpStream;
+use tokio_tungstenite::{connect_async, tungstenite::Message, WebSocketStream, MaybeTlsStream};
+use futures_util::{StreamExt, SinkExt, lock::Mutex, stream::SplitSink};
 
 #[derive(Clone, serde::Serialize)]
 struct Payload {
   message: String,
 }
+
+static mut SOCKET: Vec<Arc<Mutex<SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>>>> = Vec::new();
 
 fn main() {
   // Tauri build setup:
@@ -22,7 +27,7 @@ fn main() {
       window.set_shadow(true);
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![web_connect])
+    .invoke_handler(tauri::generate_handler![web_connect, send_message])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -39,16 +44,23 @@ async fn web_connect(window: Window, username: String) {
   // Send a login request to the server.
   println!("username: {}", username);
   write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username))).await.unwrap();
-
-  // Subscribe to the send message event from the frontend.
-  //window.listen_global("send-message", move |event| {
-    //write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username)));
-    //println!("got event-name with payload {:?}", event.payload());
-  //});
+  window.emit_all("onlogin", Payload { message: username }).unwrap();
+  unsafe {
+    SOCKET.push(Arc::new(Mutex::new(write)));
+  }
 
   // Wait for messages to arrive.
   read.for_each(|message| async {
     let data = String::from_utf8(message.unwrap().into_data()).unwrap();
     window.emit_all("onmessage", Payload { message: data }).unwrap();
   }).await;
+}
+
+#[tauri::command]
+async fn send_message(data: String) {
+  unsafe {
+    let msg_data = format!("{{\"type\":\"chat\",\"content\":\"{}\"}}", data);
+    let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
+    socket.send(Message::text(msg_data)).await.expect("Can send message");
+  }
 }
