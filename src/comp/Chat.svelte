@@ -7,7 +7,8 @@ let input = "";
 let user = "";
 
 store.user.subscribe(value => {
-  user = value.name;
+  if (value) user = value.name;
+  else user = undefined;
 })
 
 const sendMessage = () => {

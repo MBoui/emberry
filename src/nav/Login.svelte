@@ -1,25 +1,23 @@
 <script lang="ts">
-import { onMount } from 'svelte';
 import { invoke } from '@tauri-apps/api/tauri';
 import { useNavigate } from "svelte-navigator";
-import * as store from "@/stores";
-
-let currentUser: { id: string, name: string };
-
-// Handle refreshes:
-onMount(() => {
-    store.user.subscribe((user) => {
-        currentUser = user;
-        if (currentUser) navigate('/home');
-    });
-	if (currentUser) navigate('/home');
-});
+import { listen } from '@tauri-apps/api/event';
+import { onMount } from 'svelte';
 
 const navigate = useNavigate();
 let name = '';
 
+// Navigate to home on login.
+listen('onlogin', () => {
+    navigate('/home');
+});
+
+onMount(() => {
+    if (sessionStorage.getItem("username") != undefined) navigate('/home');
+});
+
 const join = () => {
-    if (currentUser == null) {
+    if (sessionStorage.getItem("username") == undefined) {
         invoke('web_connect', { username: name });
     } else {
         navigate('/home');
