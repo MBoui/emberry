@@ -71,7 +71,7 @@ const join = () => {
         input {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
-            font-family: CascadiaCode;
+            font-family: NotoSans;
         }
 
         button {

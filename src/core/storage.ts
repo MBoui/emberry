@@ -3,10 +3,10 @@ import * as store from "@/stores";
 export default function initStorage() {
 
     // Save the username into local storage.
-    if (localStorage.getItem("username") != null && localStorage.getItem("username") != 'null')
-		store.user.set({ id: '...', name: localStorage.getItem("username") });
+    if (sessionStorage.getItem("username") != null && sessionStorage.getItem("username") != 'null')
+		store.user.set({ id: '...', name: sessionStorage.getItem("username") });
     else store.user.set(null);
-	store.user.subscribe(user => localStorage.setItem("username", (user ? user.name : null)));
+	store.user.subscribe(user => sessionStorage.setItem("username", (user ? user.name : null)));
 
     // Save the global chat into local storage.
     if (localStorage.getItem("globalchat") != null && localStorage.getItem("globalchat") != 'null')

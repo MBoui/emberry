@@ -26,9 +26,9 @@ onMount(() => {
 	<Titlebar />
 
 	<div class="background">
-		<Router primary={true}>
+		<Router>
 			<Route path="/"><Login /></Route>
-			<Route path="home"><Home /></Route>
+			<Route path="home" primary={true}><Home /></Route>
 		</Router>
 	</div>
 

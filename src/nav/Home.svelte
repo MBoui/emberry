@@ -13,7 +13,7 @@ onMount(() => {
     store.user.subscribe((user) => {
         currentUser = user;
     });
-	if (!currentUser) navigate('/');
+	if (!currentUser || !localStorage.getItem("username")) navigate('/');
 });
 
 </script>
