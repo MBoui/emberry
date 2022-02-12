@@ -97,6 +97,7 @@ store.users.subscribe(value => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        user-select: none;
 
         svg {
             color: #57574c;

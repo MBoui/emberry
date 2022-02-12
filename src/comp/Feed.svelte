@@ -45,7 +45,8 @@ onMount(() => {
 <style lang="scss">
   .feed {
     width: 100%;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 140px);
+    margin-top: 10px;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -94,6 +95,7 @@ onMount(() => {
         }
 
         opacity: 0;
+        user-select: none;
       }
 
       &.first {
@@ -103,6 +105,7 @@ onMount(() => {
 
         .user {
           opacity: 1;
+          user-select: all;
         }
 
         &::before {
@@ -138,6 +141,24 @@ onMount(() => {
         align-items: center;
 
         color: #eeeeee;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #00000022;
+      border-radius: 100px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 100px;
+      background: #00000022;
+
+      &:hover {
+        background: #ffffff22;
       }
     }
   }

@@ -23,7 +23,7 @@ export default function handleTraffic(message: string) {
             });
             break;
 
-        case 'update-users': // when a user updates update them in the users list.
+        case 'join': // when a user joins add them to the users list.
             store.users.update(users => {
                 users.push(json.user);
                 return users;

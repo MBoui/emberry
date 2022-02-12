@@ -71,7 +71,8 @@ const sendMessage = () => {
     align-items: center;
 
     .chat-body {
-      width: calc(100% - 40px);
+      width: calc(100% - 30px);
+      margin-left: 10px;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
