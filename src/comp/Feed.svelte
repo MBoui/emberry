@@ -1,5 +1,6 @@
 <script lang="ts">
 import * as store from "@/stores";
+import { onMount } from "svelte";
 
 let chat: Array<{ sender: string; content: string }> = [];
 
@@ -18,6 +19,11 @@ const isFirst = (index: number): boolean => {
   }
   return false;
 }
+
+onMount(() => {
+  var scrollDiv = document.getElementsByClassName("feed")[0];
+  scrollDiv.scrollTop = scrollDiv.scrollHeight;
+});
 
 </script>
 
@@ -39,12 +45,13 @@ const isFirst = (index: number): boolean => {
 <style lang="scss">
   .feed {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 120px);
     padding: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
     font-family: NotoSans;
+    overflow-y: auto;
 
     .item {
       width: 100%;

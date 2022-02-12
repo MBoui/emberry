@@ -15,7 +15,8 @@ const sendMessage = () => {
   store.globalChat.update(global => {
     global.push({ sender: user, content: input });
     return global;
-  })
+  });
+  input = "";
 };
 </script>
 
@@ -39,7 +40,9 @@ const sendMessage = () => {
         >
       </div>
 
-      <input type="text" bind:value={input} />
+      <form on:submit|preventDefault={sendMessage}>
+        <input type="text" bind:value={input} />
+      </form>
 
       <div class="{input.length > 0 ? 'send valid' : 'send'}" on:click={sendMessage}>
         <svg
@@ -110,15 +113,19 @@ const sendMessage = () => {
           }
         }
 
-        input {
+        form {
           flex-grow: 1;
 
-          outline: none !important;
-          background: transparent !important;
-          padding: 10px;
-          font-size: 0.9em;
-          font-family: NotoSans;
-          color: #dddddd;
+          input {
+            width: 100%;
+
+            outline: none !important;
+            background: transparent !important;
+            padding: 10px;
+            font-size: 0.9em;
+            font-family: NotoSans;
+            color: #dddddd;
+          }
         }
 
         .send {
