@@ -43,18 +43,18 @@ jobs:
       run: npm ci
     # create the .env file
     - name: Create .env File
-      if: matrix.platform == 'ubuntu-latest' # Linux .env
-        run: |
-            touch .env
-            echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} >> .env
-            cat .env
-      if: matrix.platform == 'macos-latest' # MacOS .env
-        run: |
-            touch .env
-            echo "SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }}" >> .env
-      if : matrix.platform == 'windows-latest' # Windows .env
-        run: |
-            echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} > .env
+    - if: matrix.platform == 'ubuntu-latest' # Linux .env
+      run: |
+        touch .env
+        echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} >> .env
+        cat .env
+    - if: matrix.platform == 'macos-latest' # MacOS .env
+      run: |
+        touch .env
+        echo "SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }}" >> .env
+    - if : matrix.platform == 'windows-latest' # Windows .env
+      run: |
+        echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} > .env
     # build the app using tauri
     - name: Build App
       run: npm run tauri build
