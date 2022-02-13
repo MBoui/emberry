@@ -40,7 +40,7 @@ jobs:
         sudo apt-get install -y webkit2gtk-4.0
     # install dependencies
     - name: Install Dependencies
-      run: npm ci
+      run: yarn
     # Linux .env
     - name: Create .env File (Linux)
       if: matrix.platform == 'ubuntu-latest' 
@@ -61,7 +61,7 @@ jobs:
         echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} > .env
     # build the app using tauri
     - name: Build App
-      run: npm run build
+      run: yarn build
     - uses: tauri-apps/tauri-action@v0
       with:
         tagName: v__VERSION__ # \_\_VERSION\_\_ is automatically replaced by the version
