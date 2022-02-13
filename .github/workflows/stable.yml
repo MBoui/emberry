@@ -61,7 +61,7 @@ jobs:
         echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} > .env
     # build the app using tauri
     - name: Build App
-      run: npm run tauri build
+      run: npm run build
     - uses: tauri-apps/tauri-action@v0
       with:
         tagName: v__VERSION__ # \_\_VERSION\_\_ is automatically replaced by the version
