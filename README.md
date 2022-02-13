@@ -2,8 +2,8 @@
 
 ![Downloads](https://img.shields.io/github/downloads/mxcop/flux/total?label=Downloads&style=flat-square)
 ![License](https://img.shields.io/github/license/mxcop/flux?label=License&style=flat-square)
-![Tauri](https://img.shields.io/github/package-json/dependency-version/mxcop/flux/dev/@tauri-apps/cli?style=flat-square)
-![Svelte](https://img.shields.io/github/package-json/dependency-version/mxcop/flux/dev/svelte?style=flat-square)
+![Tauri](https://img.shields.io/github/package-json/dependency-version/mxcop/flux/dev/@tauri-apps/cli?color=%2323b2c3&label=Tauri&logo=target&logoColor=%23fec430&style=flat-square)
+![Svelte](https://img.shields.io/github/package-json/dependency-version/mxcop/flux/dev/svelte?color=orange&label=Svelte&logo=svelte&logoColor=orange&style=flat-square)
 
 ## About
 Flux is a chat application focused towards gaming and programming.<br>
