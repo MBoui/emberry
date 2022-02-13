@@ -20,4 +20,4 @@ We're always open for any feedback from the community :D
 ## License
 Copyright (c) Max Coppen. All rights reserved.
 
-Licensed under the MIT license.
+Licensed under the GNU general public license.
