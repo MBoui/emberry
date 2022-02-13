@@ -23,6 +23,8 @@ tokio = { version = "1.16.1", features = ["full"] }
 tokio-tungstenite = { version = "*", features = ["native-tls"] }
 futures-util = "0.3"
 dotenv = "0.15.0"
+dotenv_codegen = "0.15.0"
+envy = "0.4.2"
 
 [features]
 default = [ "custom-protocol" ]

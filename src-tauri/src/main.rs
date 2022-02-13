@@ -4,9 +4,12 @@
 )]
 
 use std::env;
-use dotenv::dotenv;
 use std::sync::Arc;
 
+#[macro_use]
+extern crate dotenv_codegen;
+
+use serde::Deserialize;
 use tauri::{Manager, Window};
 use tauri_plugin_shadows::Shadows;
 use tokio::net::TcpStream;
@@ -18,10 +21,19 @@ struct Payload {
   message: String,
 }
 
+#[derive(Deserialize, Debug)]
+struct Config {
+  server_address: String
+}
+
 static mut SOCKET: Vec<Arc<Mutex<SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>>>> = Vec::new();
+static mut ENV: Config = Config { server_address: String::new() };
 
 fn main() {
-  dotenv().ok();
+  // Setup the environment variables:
+  unsafe {
+    ENV = envy::from_iter([(String::from("SERVER_ADDRESS"), String::from(dotenv!("SERVER_ADDRESS")))]).unwrap();
+  }
 
   // Tauri build setup:
   tauri::Builder::default()
@@ -40,26 +52,27 @@ fn main() {
 async fn web_connect(window: Window, username: String) {
   println!("Connecting to signal server...");
 
-  //let addr = env::var("SERVER_ADDRESS").expect("Can load server address from .env");
-  let addr = "ws://84.30.14.3:25656";
-  let (ws_stream, _) = connect_async(addr).await.expect("Failed to connect");
-  println!("WebSocket handshake has been successfully completed");
-
-  let (mut write, read) = ws_stream.split();
-
-  // Send a login request to the server.
-  println!("username: {}", username);
-  write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username))).await.unwrap();
-  window.emit_all("onlogin", Payload { message: username }).unwrap();
   unsafe {
-    SOCKET.push(Arc::new(Mutex::new(write)));
-  }
+    // Load the server address from env.
+    let addr = &ENV.server_address;
 
-  // Wait for messages to arrive.
-  read.for_each(|message| async {
-    let data = String::from_utf8(message.unwrap().into_data()).unwrap();
-    window.emit_all("onmessage", Payload { message: data }).unwrap();
-  }).await;
+    let (ws_stream, _) = connect_async(addr).await.expect("Failed to connect");
+    println!("WebSocket handshake has been successfully completed");
+
+    let (mut write, read) = ws_stream.split();
+
+    // Send a login request to the server.
+    println!("username: {}", username);
+    write.send(Message::text(format!("{{\"type\":\"login\",\"name\":\"{}\"}}", username))).await.unwrap();
+    window.emit_all("onlogin", Payload { message: username }).unwrap();
+    SOCKET.push(Arc::new(Mutex::new(write)));
+
+    // Wait for messages to arrive.
+    read.for_each(|message| async {
+      let data = String::from_utf8(message.unwrap().into_data()).unwrap();
+      window.emit_all("onmessage", Payload { message: data }).unwrap();
+    }).await;
+  }
 }
 
 #[tauri::command]
