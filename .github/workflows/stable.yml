@@ -63,6 +63,8 @@ jobs:
     - name: Build App
       run: yarn build
     - uses: tauri-apps/tauri-action@v0
+      env: # add in the server address from secrets
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tagName: v__VERSION__ # \_\_VERSION\_\_ is automatically replaced by the version
         releaseName: "Flux v__VERSION__"
