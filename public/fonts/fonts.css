@@ -55,3 +55,15 @@
 	src: url(Montserrat-Black.ttf);
     font-weight: 800;
 }
+
+@font-face {
+	font-family: NotoSans;
+	src: url(NotoSans-Regular.ttf);
+    font-weight: 400;
+}
+
+@font-face {
+	font-family: NotoSans;
+	src: url(NotoSans-Bold.ttf);
+    font-weight: 700;
+}

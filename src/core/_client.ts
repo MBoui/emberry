@@ -32,7 +32,6 @@ export class Client {
     onMessage(data: MessageEvent<String>) {
         const json = JSON.parse(data.data as string);
         console.log('websocket recieved:', json);
-        store.latest_msg.set(data.data);
 
         switch (json.type as string) {
             case 'login': // when a login is accepted we check if it was succesful.

@@ -1,19 +1,22 @@
 <script lang="ts">
-import { listen } from '@tauri-apps/api/event'
 import { appWindow } from '@tauri-apps/api/window'
 
 import { Router, Route } from "svelte-navigator";
 import Titlebar from "./win/Titlebar.svelte";
 import Login from "./nav/Login.svelte";
 import Home from "./nav/Home.svelte";
+import { onMount } from 'svelte';
+import initStorage from './core/storage';
 
 let isFocused = true;
 
+// Tauri window events:
 appWindow.listen("tauri://focus", () => isFocused = true);
 appWindow.listen("tauri://blur", () => isFocused = false);
 
-listen('onmessage', ev => {
-    console.log((ev.payload as any).message);
+// Setup the user so it persists.
+onMount(() => {
+	initStorage();
 });
 
 </script>
@@ -23,7 +26,7 @@ listen('onmessage', ev => {
 	<Titlebar />
 
 	<div class="background">
-		<Router>
+		<Router primary={false}>
 			<Route path="/"><Login /></Route>
 			<Route path="home"><Home /></Route>
 		</Router>

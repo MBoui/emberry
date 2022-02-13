@@ -1,17 +1,21 @@
 <script lang="ts">
 import Users from '../comp/Users.svelte';
-import { latest_msg } from '@/stores';
+import Chat from '../comp/Chat.svelte';
+import { onMount } from 'svelte';
+import { useNavigate } from 'svelte-navigator';
 
-let msg: String = '';
+const navigate = useNavigate();
 
-latest_msg.subscribe(value => {
-    msg = value;
+// Handle refreshes:
+onMount(() => {
+	if (sessionStorage.getItem("username") == 'null') navigate('/');
 });
+
 </script>
 
 <div class="home">
-    <h1>{msg}</h1>
     <Users />
+    <Chat />
 </div>
 
 <style lang="scss">
@@ -21,18 +25,7 @@ latest_msg.subscribe(value => {
         width: 100%;
         height: 100%;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-
-        h1 {
-            width: 100%;
-            color: #888888;
-            font-size: 0.8em;
-            font-weight: 500;
-            margin: 0;
-            margin-top: 6px;
-            outline: none;
-        }
     }
 </style>
