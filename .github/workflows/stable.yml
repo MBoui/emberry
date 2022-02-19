@@ -14,7 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [windows-latest]
+        # platform: [macos-latest, ubuntu-latest, windows-latest]
 
     # run the builds in parallel
     runs-on: ${{ matrix.platform }}
