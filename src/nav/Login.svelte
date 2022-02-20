@@ -1,15 +1,29 @@
 <script lang="ts">
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/tauri';
 import { useNavigate } from "svelte-navigator";
+import { listen } from '@tauri-apps/api/event';
+import { onMount } from 'svelte';
 
 const navigate = useNavigate();
 let name = '';
 
-const join = () => {
-    console.log('username: ' + name);
-    invoke('web_connect', { username: name });
+// Navigate to home on login.
+listen('onlogin', () => {
     navigate('/home');
+});
+
+onMount(() => {
+    if (sessionStorage.getItem("username") != 'null') navigate('/home');
+});
+
+const join = () => {
+    if (sessionStorage.getItem("username") == 'null') {
+        invoke('web_connect', { username: name });
+    } else {
+        navigate('/home');
+    }
 };
+
 </script>
 
 <div class="card">
@@ -39,12 +53,14 @@ const join = () => {
         margin: 0;
         outline: none;
         height: 120px;
+        user-select: none;
     }
 
     p {
         color: #777;
         margin-top: -5px;
         font-family: CascadiaCode;
+        user-select: none;
     }
 
     .login {
@@ -53,7 +69,7 @@ const join = () => {
         input {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
-            font-family: CascadiaCode;
+            font-family: NotoSans;
         }
 
         button {

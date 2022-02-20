@@ -1,6 +1,6 @@
 import { listen } from '@tauri-apps/api/event'
-import * as store from '@/stores';
 import handleTraffic from './traffic';
+import * as store from "@/stores";
 
 /**
  * Initialises the frontend hooks into the backend events.
@@ -11,11 +11,15 @@ export default function initHooks() {
     listen('onmessage', ({ payload }) => {
         const msg = (payload as any).message;
 
-        /* Add the latest message to the store [DEBUG] */
-        store.latest_msg.set(msg);
-
         /* Handle the network traffic elsewhere. */
         handleTraffic(msg);
+    });
+
+    /** Called whenever the WebRTC client does login. */
+    listen('onlogin', ({ payload }) => {
+        const username = (payload as any).message;
+
+        store.user.set({ id: '...', name: username });
     });
 
 }

@@ -14,7 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [windows-latest]
+        # platform: [macos-latest, ubuntu-latest, windows-latest]
 
     # run the builds in parallel
     runs-on: ${{ matrix.platform }}
@@ -37,15 +38,34 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y webkit2gtk-4.0
-    # install dependencies and build
+        sudo apt install libwebkit2gtk-4.0-dev
+    # install dependencies
     - name: Install Dependencies
       run: yarn
+    # Linux .env
+    - name: Create .env File (Linux)
+      if: matrix.platform == 'ubuntu-latest' 
+      run: |
+        touch .env
+        echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} >> .env
+        cat .env
+    # MacOS .env
+    - name: Create .env File (MacOS)
+      if: matrix.platform == 'macos-latest'
+      run: |
+        touch .env
+        echo "SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }}" >> .env
+    # Windows .env
+    - name: Create .env File (Windows)
+      if : matrix.platform == 'windows-latest'
+      run: |
+        echo SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} > .env
+    # build the app using tauri
     - name: Build App
-      run: yarn tauri build
+      run: yarn build
     - uses: tauri-apps/tauri-action@v0
       env: # add in the server address from secrets
-        SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tagName: v__VERSION__ # \_\_VERSION\_\_ is automatically replaced by the version
         releaseName: "Flux v__VERSION__"
