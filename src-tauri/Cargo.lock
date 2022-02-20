@@ -808,6 +808,7 @@ dependencies = [
 name = "flux"
 version = "0.0.0"
 dependencies = [
+ "base64",
  "dotenv",
  "dotenv_codegen",
  "envy",

@@ -15,6 +15,7 @@ use tauri_plugin_shadows::Shadows;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, WebSocketStream, MaybeTlsStream};
 use futures_util::{StreamExt, SinkExt, lock::Mutex, stream::SplitSink};
+extern crate base64;
 
 #[derive(Clone, serde::Serialize)]
 struct Payload {
@@ -43,7 +44,7 @@ fn main() {
       window.set_shadow(true);
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![web_connect, send_message])
+    .invoke_handler(tauri::generate_handler![web_connect, send_message, send_file])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -79,6 +80,20 @@ async fn web_connect(window: Window, username: String) {
 async fn send_message(data: String) {
   unsafe {
     let msg_data = format!("{{\"type\":\"chat\",\"content\":\"{}\"}}", data);
+    let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
+    socket.send(Message::text(msg_data)).await.expect("Can send message");
+  }
+}
+
+#[tauri::command]
+async fn send_file(path: String) {
+
+  println!("{}", path.clone());
+  let file = std::fs::read(path.clone()).expect("Can load file");
+  let name = std::path::Path::new(&path).file_name().unwrap().to_str().unwrap();
+
+  unsafe {
+    let msg_data = format!("{{\"type\":\"file\",\"name\":\"{}\",\"content\":\"{}\"}}", name, base64::encode(&file));
     let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
     socket.send(Message::text(msg_data)).await.expect("Can send message");
   }
