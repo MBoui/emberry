@@ -1,11 +1,11 @@
 [package]
-name = "flux"
+name = "emberry"
 version = "0.0.0"
 description = "A cool chat app"
 authors = ["Max Coppen"]
 license = ""
 repository = ""
-default-run = "flux"
+default-run = "emberry"
 edition = "2018"
 build = "src/build.rs"
 
@@ -21,6 +21,7 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", features
 tauri-plugin-shadows = { git = "https://github.com/tauri-apps/tauri-plugin-shadows", features = ["tauri-impl"] } # or "tao-impl" for TAO projects.
 tokio = { version = "1.16.1", features = ["full"] }
 tokio-tungstenite = { version = "*", features = ["native-tls"] }
+webrtc-ice = "0.6.6"
 futures-util = "0.3"
 dotenv = "0.15.0"
 dotenv_codegen = "0.15.0"

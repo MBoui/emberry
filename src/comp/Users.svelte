@@ -1,17 +1,22 @@
 <script lang="ts">
 import * as store from '@/stores';
+import { invoke } from '@tauri-apps/api/tauri';
 
 let users: { id: string, name: string }[];
 
 store.users.subscribe(value => {
     users = value;
 });
+
+const peer_request = (uid: string) => {
+    invoke('peer_request', { peerId: uid });
+}
 </script>
 
 <div class="user-list">
     {#if users.length > 0}
     {#each users as user}
-        <div class="user">
+        <div class="user" on:click={() => peer_request(user.id)}>
             <div class="user-info">
                 <div class="user-name">{user.name}</div>
                 <div class="user-id">({user.id})</div>

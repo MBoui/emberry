@@ -27,7 +27,7 @@ const join = () => {
 </script>
 
 <div class="card">
-    <h1>Flux</h1>
+    <h1>Emberry</h1>
     <p>Join the network!</p>
     <div class="login">
         <input type="text" placeholder="Enter your username..." bind:value={name}>
