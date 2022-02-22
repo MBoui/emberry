@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "Flux",
+    "productName": "Emberry",
     "version": "0.0.1"
   },
   "build": {
@@ -13,7 +13,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.flux.app",
+      "identifier": "com.emberry.app",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -53,7 +53,7 @@
     },
     "windows": [
       {
-        "title": "Flux",
+        "title": "Emberry",
         "width": 800,
         "height": 600,
         "minWidth": 350,
