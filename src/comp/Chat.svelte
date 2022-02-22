@@ -1,10 +1,12 @@
 <script lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
+import { open } from "@tauri-apps/api/dialog";
 import * as store from "@/stores";
 import Feed from "./Feed.svelte";
 
 let input = "";
 let user = "";
+let dialog = false;
 
 store.user.subscribe(value => {
   if (value) user = value.name;
@@ -15,11 +17,27 @@ const sendMessage = () => {
   if (input.length > 0) {
     invoke('send_message', { data: input });
     store.globalChat.update(global => {
-      global.push({ sender: user, content: input });
+      global.push({ type: 'msg', sender: user, content: input });
       return global;
     });
     input = "";
   }
+};
+
+const sendFile = () => {
+  if (dialog == false) {
+    open().then((paths) => {
+      dialog = false;
+      if (paths) {
+        invoke('send_file', { path: paths });
+        store.globalChat.update(global => {
+          global.push({ type: 'file', sender: user, content: { name: (paths as string).split('\\').pop(), data: '' } });
+          return global;
+        });
+      }
+    });
+  }
+  dialog = true;
 };
 </script>
 
@@ -30,7 +48,7 @@ const sendMessage = () => {
 
   <div class="chat-footer">
     <div class="input">
-      <div class="upload">
+      <div class="upload" on:click={sendFile}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24px"

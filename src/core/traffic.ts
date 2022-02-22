@@ -1,4 +1,5 @@
 import * as store from '@/stores';
+import { invoke } from '@tauri-apps/api/tauri';
 
 /**
  * Handles the incoming traffic from the WebRTC server.
@@ -30,10 +31,22 @@ export default function handleTraffic(message: string) {
 
         case 'chat': // when a message is send in global chat.
             store.globalChat.update(chat => {
-                chat.push({ sender: json.sender.name, content: json.content });
+                chat.push({ type: 'msg', sender: json.sender.name, content: json.content });
                 return chat;
             });
             console.log({ sender: json.sender.name, content: json.content });
+            break;
+
+        case 'file': // when a file is send in global chat.
+            store.globalChat.update(chat => {
+                chat.push({ type: 'file', sender: json.sender.name, content: { name: json.name, data: json.content } });
+                return chat;
+            });
+            console.log({ sender: json.sender.name, name: json.name, content: json.content });
+            break;
+
+        case 'candidate': // when a candidate is recieved.
+            invoke('recieved_candidate', { candidate: json.candidate });
             break;
 
         case 'error':

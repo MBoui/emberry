@@ -13,7 +13,8 @@ jobs:
     # define all platforms to build for
     strategy:
       fail-fast: false
-      platform: [windows-latest]
+      matrix:
+        platform: [windows-latest]
         # platform: [macos-latest, ubuntu-latest, windows-latest]
 
     # run the builds in parallel
@@ -67,7 +68,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tagName: v__VERSION__-nightly # \_\_VERSION\_\_ is automatically replaced by the version
-        releaseName: "Flux v__VERSION__-nightly"
+        releaseName: "Emberry v__VERSION__-nightly"
         releaseBody: "See the assets to download this version and install."
         releaseDraft: true
         prerelease: false

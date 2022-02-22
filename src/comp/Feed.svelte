@@ -1,8 +1,11 @@
 <script lang="ts">
+import { writeBinaryFile } from "@tauri-apps/api/fs";
+import { save } from "@tauri-apps/api/dialog";
 import * as store from "@/stores";
 import { onMount } from "svelte";
 
-let chat: Array<{ sender: string; content: string }> = [];
+let chat: Array<{ type: string; sender: string; content: any }> = [];
+let dialog = false;
 
 store.globalChat.subscribe((global) => {
   chat = global;
@@ -18,6 +21,30 @@ const isFirst = (index: number): boolean => {
     return true; // True if the message before is from another sender.
   }
   return false;
+}
+
+const downloadFile = (data: string, name: string) => {
+  const bytes = base64ToArrayBuffer(data);
+  
+  if (dialog == false) {
+    save({ defaultPath: name }).then((path) => {
+      dialog = false;
+      if (path) {
+        writeBinaryFile({ path, contents: bytes });
+      }
+    });
+  }
+  dialog = true;
+}
+
+function base64ToArrayBuffer(base64) {
+    var binary_string = window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
 }
 
 onMount(() => {
@@ -37,7 +64,22 @@ onMount(() => {
         </div>
       </div>
 
-      <div class="content">{msg.content}</div>
+      {#if msg.type == 'msg'}
+        <div class="content">{msg.content}</div>
+      {/if}
+
+      {#if msg.type == 'file'}
+        <div class="content">
+          Uploaded file: 
+          {#if msg.content.data !== ''}
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <button class="link" on:click={() => downloadFile(msg.content.data, msg.content.name)}>{msg.content.name}</button>
+          {:else}
+            {msg.content.name}
+          {/if}
+        </div>
+      {/if}
+     
     </div>
   {/each}
 </div>
