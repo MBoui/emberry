@@ -8,6 +8,7 @@ use std::sync::Arc;
 
 #[macro_use]
 extern crate dotenv_codegen;
+mod p2p;
 
 use serde::Deserialize;
 use tauri::{Manager, Window};
@@ -15,7 +16,8 @@ use tauri_plugin_shadows::Shadows;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, WebSocketStream, MaybeTlsStream};
 use futures_util::{StreamExt, SinkExt, lock::Mutex, stream::SplitSink};
-use webrtc_ice::{agent::{Agent, agent_config::AgentConfig}, network_type::NetworkType, udp_network::UDPNetwork, candidate::Candidate};
+
+use crate::p2p::{peer_request, recieved_offer};
 extern crate base64;
 
 #[derive(Clone, serde::Serialize)]
@@ -45,7 +47,7 @@ fn main() {
       window.set_shadow(true);
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![web_connect, send_message, send_file, recieved_candidate, peer_request])
+    .invoke_handler(tauri::generate_handler![web_connect, send_message, send_file, recieved_offer, peer_request])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -98,45 +100,4 @@ async fn send_file(path: String) {
     let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
     socket.send(Message::text(msg_data)).await.expect("Can send message");
   }
-}
-
-#[tauri::command]
-async fn recieved_candidate(candidate: String) {
-  println!("Recieved Candidate: {}", candidate);
-}
-
-#[tauri::command]
-async fn peer_request(peer_id: String) {
-
-  let udp_network = UDPNetwork::Ephemeral(Default::default());
-
-  let ice_agent = Arc::new(
-    Agent::new(AgentConfig {
-        network_types: vec![NetworkType::Tcp4],
-        udp_network,
-        ..Default::default()
-    })
-    .await.unwrap(),
-  );
-
-  println!("Created ICE agent");
-
-  let destination = Arc::new(peer_id);
-  ice_agent.on_candidate(Box::new(
-    move |c: Option<Arc<dyn Candidate + Send + Sync>>| {
-      let destination2 = Arc::clone(&destination);
-      Box::pin(async move {
-        if let Some(c) = c {
-          println!("posting remoteCandidate with {}", c.marshal());
-
-          unsafe {
-            let msg_data = format!("{{\"type\":\"candidate\",\"candidate\":\"{}\",\"destination\":\"{}\"}}", c.marshal(), destination2);
-            let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
-            socket.send(Message::text(msg_data)).await.expect("Can send message");
-          }
-        }
-    })
-  })).await;
-
-  println!("Finished peer request");
 }

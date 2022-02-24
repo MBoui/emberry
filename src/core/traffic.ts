@@ -45,8 +45,8 @@ export default function handleTraffic(message: string) {
             console.log({ sender: json.sender.name, name: json.name, content: json.content });
             break;
 
-        case 'candidate': // when a candidate is recieved.
-            invoke('recieved_candidate', { candidate: json.candidate });
+        case 'offer': // when an offer is recieved.
+            invoke('recieved_offer', { offer: json.offer });
             break;
 
         case 'error':

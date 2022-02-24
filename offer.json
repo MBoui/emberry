@@ -1,0 +1,23 @@
+{
+    "version": 0,
+    "origin": {
+        "username": "-",
+        "session_id": 8550668429826279875,
+        "session_version": 169373200,
+        "network_type": "IN",
+        "address_type": "IP4",
+        "unicast_address": "0.0.0.0"
+    },
+    "session_name": "-",
+    "session_information": "None",
+    "uri": "None",
+    "email_address": "None",
+    "phone_number": "None",
+    "connection_information": "None",
+    "bandwidth": [],
+    "time_descriptions": "[TimeDescription { timing: Timing { start_time: 0, stop_time: 0 }, repeat_times: [] }",
+    "time_zones": [],
+    "encryption_key": "None",
+    "attributes": "[Attribute { key: \"fingerprint\", value: Some(\"sha-256 E1:A1: 61:9E: 16: 96: 50:CE:E9: 4D: 29:FE:EA:B2:D2: 5D: 93: 59: 7A: 39:FF:AB: 03: 23: 2A: 5D:FC:E8: 76: 61: 43:A3\")}, Attribute { key: \"group\", value: Some(\"BUNDLE\"}]", 
+    "media_descriptions": []
+}
