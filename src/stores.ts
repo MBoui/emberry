@@ -14,3 +14,8 @@ export const users = writable<Array<{ id: string, name: string }>>([]);
  * A log of the global chat.
  */
 export const globalChat = writable<Array<{ type: string, sender: string, content: any }>>([]);
+
+/**
+ * List of all offers.
+ */
+ export const offers = writable<Array<{ origin: string, id: string }>>([]);

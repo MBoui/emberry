@@ -1,5 +1,6 @@
 <script lang="ts">
 import { appWindow } from '@tauri-apps/api/window'
+import * as store from '@/stores';
 
 import { Router, Route } from "svelte-navigator";
 import Titlebar from "./win/Titlebar.svelte";
@@ -7,6 +8,7 @@ import Login from "./nav/Login.svelte";
 import Home from "./nav/Home.svelte";
 import { onMount } from 'svelte';
 import initStorage from './core/storage';
+import { invoke } from '@tauri-apps/api/tauri';
 
 let isFocused = true;
 
@@ -17,6 +19,17 @@ appWindow.listen("tauri://blur", () => isFocused = false);
 // Setup the user so it persists.
 onMount(() => {
 	initStorage();
+
+	store.offers.subscribe(offers => {
+		if (offers.length > 0) {
+			console.log("New Offer: " + JSON.stringify(offers[offers.length - 1]));
+
+			let offer = offers[offers.length - 1];
+
+			// DANGER!! this is VERY INSECURE must be changed!!
+			invoke('offer_respond', { offerId: offer.id, accepted: true });
+		}
+	});
 });
 
 </script>

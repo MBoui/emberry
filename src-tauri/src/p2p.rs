@@ -1,163 +1,107 @@
-use std::{sync::Arc, time::Duration};
+use std::sync::{Arc, Mutex};
 
 use futures_util::SinkExt;
+use serde_json::json;
+use tokio::{net::{TcpStream, TcpListener}, io::{AsyncWriteExt, AsyncReadExt}};
 use tokio_tungstenite::tungstenite::Message;
-use webrtc::{
-  api::{
-    interceptor_registry::register_default_interceptors, media_engine::MediaEngine, APIBuilder,
-  },
-  data_channel::{data_channel_init::RTCDataChannelInit, RTCDataChannel},
-  ice_transport::{ice_connection_state::RTCIceConnectionState, ice_server::RTCIceServer},
-  interceptor::registry::Registry,
-  peer_connection::{
-    configuration::RTCConfiguration, offer_answer_options::RTCOfferOptions,
-    sdp::session_description::RTCSessionDescription, RTCPeerConnection,
-  },
-};
 
-use crate::SOCKET;
+use crate::{SOCKET, ENV};
+
+struct Session {
+  stream: Arc<Mutex<TcpStream>>,
+  id: String
+}
+
+static mut SESSIONS: Vec<Session> = Vec::new();
 
 #[tauri::command]
 pub async fn peer_request(peer_id: String) {
   println!("Sending peer request to {}", peer_id);
 
-  initiate_connection(peer_id).await;
-}
-
-/**
- * Initiate a RTC peer connection with another peer on the network.
- */
-async fn initiate_connection(peer_id: String) {
-  let pc = create_peer_connection().await;
-
-  // Create a config for the ICE offer:
-  let offer_config = RTCOfferOptions {
-    ice_restart: false,
-    ..Default::default()
-  };
-
-  let offer = pc
-    .create_offer(Some(offer_config))
-    .await
-    .expect("Can create ICE offer");
-
-  println!("Created ICE Offer: {:?}", offer);
+  let request_json = json!({
+    "type": "request",
+    "target": peer_id
+  });
 
   unsafe {
-    let msg_data = format!(
-      "{{\"type\":\"offer\",\"offer\":{},\"destination\":\"{}\"}}",
-      serde_json::to_string(&offer).unwrap(),
-      peer_id
-    );
-    let mut socket = SOCKET.first().expect("Can get write stream").lock().await;
-    socket
-      .send(Message::text(msg_data))
-      .await
-      .expect("Can send message");
+    let mut socket = SOCKET.first().expect("Failed to get stream").lock().await;
+    socket.send(Message::text(request_json.to_string())).await.expect("Failed to send request");
   }
-}
-
-/**
- * Creates the peer connection object.
- */
-async fn create_peer_connection() -> Arc<RTCPeerConnection> {
-  // Create a MediaEngine object to configure the supported codec
-  let mut m = MediaEngine::default();
-
-  match m.register_default_codecs() {
-    Ok(_) => {}
-    Err(err) => panic!("{}", err),
-  };
-
-  let mut registry = Registry::new();
-
-  // Use the default set of Interceptors
-  registry = match register_default_interceptors(registry, &mut m) {
-    Ok(r) => r,
-    Err(err) => panic!("{}", err),
-  };
-
-  // Create the API object with the MediaEngine
-  let api = APIBuilder::new()
-    .with_media_engine(m)
-    .with_interceptor_registry(registry)
-    .build();
-
-  // Create the RTC config:
-  let config = RTCConfiguration {
-    ice_servers: vec![RTCIceServer {
-      urls: vec!["stun:stun.l.google.com:19302".to_owned()], // stun:84.30.14.3:25656 | stun:stun.l.google.com:19302
-      ..Default::default()
-    }],
-    ..Default::default()
-  };
-
-  // Create a new RTCPeerConnection
-  let pc = match api.new_peer_connection(config).await {
-    Ok(p) => p,
-    Err(err) => panic!("{}", err),
-  };
-
-  // Set the handler for ICE connection state
-  // This will notify you when the peer has connected/disconnected
-  pc.on_ice_connection_state_change(Box::new(|connection_state: RTCIceConnectionState| {
-    println!("ICE Connection State has changed: {}", connection_state);
-    Box::pin(async {})
-  }))
-  .await;
-
-  // Send the current time via a DataChannel to the remote peer every 3 seconds
-  pc.on_data_channel(Box::new(|d: Arc<RTCDataChannel>| {
-    Box::pin(async move {
-      let d2 = Arc::clone(&d);
-      d.on_open(Box::new(move || {
-        Box::pin(async move {
-          while d2
-            .send_text(format!("{:?}", tokio::time::Instant::now()))
-            .await
-            .is_ok()
-          {
-            tokio::time::sleep(Duration::from_secs(3)).await;
-          }
-        })
-      }))
-      .await;
-    })
-  }))
-  .await;
-
-  Arc::new(pc)
 }
 
 #[tauri::command]
-pub async fn recieved_offer(offer: String) {
-  println!("Recieved Offer: {}", offer);
+pub async fn offer_respond(offer_id: String, accepted: bool) {
+  println!("Responding to offer {} with {}", offer_id, accepted);
 
-  process_offer(offer).await;
+  let response_json = json!({
+    "type": "offer",
+    "id": offer_id,
+    "accept": accepted
+  });
+
+  unsafe {
+    let mut socket = SOCKET.first().expect("Failed to get stream").lock().await;
+    socket.send(Message::text(response_json.to_string())).await.expect("Failed to send request");
+  }
 }
 
-/**
- * Process an offer from another peer on the network.
- */
-async fn process_offer(offer: String) {
-  let session_desc =
-    serde_json::from_str::<RTCSessionDescription>(&offer).expect("Can parse offer");
+#[tauri::command]
+pub async fn init_session(offer_id: String) {
+  // Load the server address from env.
+  let addr;
+  unsafe { addr = &ENV.server_address }
 
-  let pc = create_peer_connection().await;
+  // Create the session and add it to the sessions list:
+  let session = TcpStream::connect(addr).await.expect("Session failed to connect to the server");
 
-  let dc = pc
-    .create_data_channel("data", Some(RTCDataChannelInit::default()))
-    .await
-    .unwrap();
+  let session_json = json!({
+    "type": "session",
+    "offer": offer_id,
+    "port": session.local_addr().expect("Failed to get local session port").port()
+  });
 
-  dc.on_message(Box::new(|msg| {
-    Box::pin(async move {
-      println!("RTC Recieved: {:?}", msg);
-    })
-  }))
-  .await;
+  unsafe { SESSIONS.push(Session { stream: Arc::new(Mutex::new(session)), id: offer_id.clone() }); }
 
-  if let Err(err) = pc.set_remote_description(session_desc).await {
-    panic!("{}", err);
+  // Send the session info to the server.
+  unsafe {
+    let mut socket = SOCKET.first().expect("Failed to get stream").lock().await;
+    socket.send(Message::text(session_json.to_string())).await.expect("Failed to send session");
   }
+
+  println!("Initialized Session");
+}
+
+#[tauri::command]
+pub async fn start_session(offer_id: String, addr: String) {
+  let session;
+
+  // Get the session that is linked to the offer:
+  unsafe { 
+    let idx = SESSIONS.iter().position(|s| s.id == offer_id);
+    match idx {
+        Some(idx) => {
+          session = SESSIONS.get(idx).unwrap().stream.clone();
+        },
+        None => { panic!("Session was not found") }
+    }
+  }
+
+  let session = session.lock().unwrap().local_addr().unwrap();
+
+  let listener = TcpListener::bind(session).await.expect("Failed to bind session listener");
+
+  tokio::spawn(async move {
+    let (mut client, _) = listener.accept().await.expect("Failed to recieve session peer");
+    
+    let mut buf = [0u8; 512];
+    client.read(&mut buf).await.expect("Failed to read session peer");
+
+    println!("Recieved from peer: {}", String::from_utf8(buf.to_vec()).unwrap());
+  });
+
+  let mut stream = TcpStream::connect(addr).await.expect("Failed to connect session stream");
+
+  stream.write("Hello Peer :D".as_bytes()).await.expect("Failed to write to session peer");
+
+  println!("Punched the hole :D");
 }

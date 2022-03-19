@@ -1,5 +1,5 @@
 import * as store from '@/stores';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api';
 
 /**
  * Handles the incoming traffic from the WebRTC server.
@@ -46,7 +46,25 @@ export default function handleTraffic(message: string) {
             break;
 
         case 'offer': // when an offer is recieved.
-            invoke('recieved_offer', { offer: json.offer });
+            store.offers.update(offers => {
+                offers.push({ origin: json.origin, id: json.id });
+                return offers;
+            });
+            break;
+
+        case 'confirm': // when a confirmation is recieved.
+            store.offers.update(offers => {
+                return offers.filter(offer => offer.id !== json.offer);
+            });
+            console.log("confirm recieved: " + json);
+            if (json.accept == true) {
+                console.log("init session");
+                invoke('init_session', { offerId: json.offer })
+            }
+            break;
+
+        case 'peer': // when a peer is recieved.
+            invoke('start_session', { offerId: json.offer, addr: json.addr })
             break;
 
         case 'error':

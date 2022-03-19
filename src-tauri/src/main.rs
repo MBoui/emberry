@@ -17,7 +17,7 @@ use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, WebSocketStream, MaybeTlsStream};
 use futures_util::{StreamExt, SinkExt, lock::Mutex, stream::SplitSink};
 
-use crate::p2p::{peer_request, recieved_offer};
+use crate::p2p::{peer_request, init_session, offer_respond, start_session};
 extern crate base64;
 
 #[derive(Clone, serde::Serialize)]
@@ -47,7 +47,7 @@ fn main() {
       window.set_shadow(true);
       Ok(())
     })
-    .invoke_handler(tauri::generate_handler![web_connect, send_message, send_file, recieved_offer, peer_request])
+    .invoke_handler(tauri::generate_handler![web_connect, send_message, send_file, peer_request, init_session, offer_respond, start_session])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -60,7 +60,7 @@ async fn web_connect(window: Window, username: String) {
     // Load the server address from env.
     let addr = &ENV.server_address;
 
-    let (ws_stream, _) = connect_async(addr).await.expect("Failed to connect");
+    let (ws_stream, _) = connect_async(format!("ws://{}", addr)).await.expect("Failed to connect");
     println!("WebSocket handshake has been successfully completed");
 
     let (mut write, read) = ws_stream.split();
